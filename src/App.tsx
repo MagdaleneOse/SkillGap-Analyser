@@ -1,6 +1,10 @@
+// src/App.tsx
+
 import React, { useState } from 'react';
 import InputForm from './components/InputForm';
-import { analyseCV, type AnalysisResult } from './lib/analyseCV';
+import ResultsDashboard from './components/ResultsDashboard';
+import { analyseCV } from './lib/analyseCV';
+import type { AnalysisResult } from './types';
 
 function App() {
   const [isLoading, setIsLoading] = useState(false);
@@ -15,15 +19,18 @@ function App() {
     try {
       const analysisResult = await analyseCV(cvText, jobDescription);
       setResult(analysisResult);
-      console.log('Analysis complete:', analysisResult);
     } catch (err) {
       const message =
         err instanceof Error ? err.message : 'An unexpected error occurred.';
       setError(message);
-      console.error('Analysis failed:', message);
     } finally {
       setIsLoading(false);
     }
+  }
+
+  function handleReset() {
+    setResult(null);
+    setError(null);
   }
 
   return (
@@ -36,19 +43,22 @@ function App() {
       </header>
 
       <main className="app-main">
-        <InputForm onSubmit={handleAnalyse} isLoading={isLoading} />
-
         {error && (
           <div className="error-banner">
             <strong>Error:</strong> {error}
           </div>
         )}
 
-        {result && (
-          <div className="raw-result">
-            <h3>Raw API Result (Phase 4 verification)</h3>
-            <pre>{JSON.stringify(result, null, 2)}</pre>
-          </div>
+        {!result ? (
+          <InputForm
+            onSubmit={handleAnalyse}
+            isLoading={isLoading}
+          />
+        ) : (
+          <ResultsDashboard
+            result={result}
+            onReset={handleReset}
+          />
         )}
       </main>
 
