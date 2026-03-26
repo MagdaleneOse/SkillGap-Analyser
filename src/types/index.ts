@@ -8,10 +8,10 @@ export interface AnalysisResult {
     categoryScores: CategoryScore[];
   }
   
-  export interface CategoryScore {
-    category: string;
-    score: number;
-  }
+  export type CategoryScore = {
+    name: string;
+    value: number;
+  };
   
   export interface AnalysisRecord {
     id: string;

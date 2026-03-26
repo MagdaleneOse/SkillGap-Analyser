@@ -1,10 +1,12 @@
+
 // src/components/ResultsDashboard.tsx
 
 import React from 'react';
 import type { AnalysisResult } from '../types';
 import MatchScoreCard from './MatchScoreCard';
 import SkillGapList from './SkillGapList';
-
+import RadarChartView from './RadarChartView';
+import BarChartView from './BarChartView';
 
 interface ResultsDashboardProps {
   result: AnalysisResult;
@@ -15,6 +17,7 @@ function ResultsDashboard({ result, onReset }: ResultsDashboardProps) {
   return (
     <div className="dashboard-wrapper">
 
+      {/* Header */}
       <div className="dashboard-header">
         <h2>Analysis Results</h2>
         <button className="reset-button" onClick={onReset}>
@@ -22,7 +25,7 @@ function ResultsDashboard({ result, onReset }: ResultsDashboardProps) {
         </button>
       </div>
 
-      {/* Top row — score card + skill gap list */}
+      {/* Row 1 — Score card + Skill gap list */}
       <div className="dashboard-top-row">
         <MatchScoreCard percentage={result.matchPercentage} />
         <SkillGapList
@@ -32,9 +35,10 @@ function ResultsDashboard({ result, onReset }: ResultsDashboardProps) {
         />
       </div>
 
-      {/* Charts section — placeholder for Phase 6 */}
-      <div className="charts-placeholder">
-        <p>Charts will appear here in Phase 6.</p>
+      {/* Row 2 — Charts side by side */}
+      <div className="charts-row">
+        <RadarChartView categoryScores={result.categoryScores} />
+        <BarChartView categoryScores={result.categoryScores} />
       </div>
 
     </div>
