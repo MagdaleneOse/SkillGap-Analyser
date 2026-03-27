@@ -1,3 +1,4 @@
+
 // src/App.tsx
 
 import React, { useState, useEffect } from 'react';
@@ -7,15 +8,18 @@ import HistoryTable from './components/HistoryTable';
 import AnalysisOverlay from './components/AnalysisOverlay';
 import ErrorCard from './components/ErrorCard';
 import ToastContainer from './components/ToastContainer';
+import AuthForm from './components/AuthForm';
 import { DashboardSkeleton } from './components/SkeletonCard';
 import { analyseCV } from './lib/analyseCV';
-import { saveAnalysis, loadAnalysisHistory } from './lib/supabaseClient';
+import { saveAnalysis, loadAnalysisHistory, supabase } from './lib/supabaseClient';
+import { useAuth } from './hooks/useAuth';
 import { useToast } from './hooks/useToast';
 import type { AnalysisResult, AnalysisRecord } from './types';
 
 type Phase = 'idle' | 'analysing' | 'results' | 'error';
 
 function App() {
+  const { user, loading: authLoading } = useAuth();
   const [phase, setPhase] = useState<Phase>('idle');
   const [result, setResult] = useState<AnalysisResult | null>(null);
   const [error, setError] = useState<string | null>(null);
@@ -23,9 +27,14 @@ function App() {
   const [historyLoading, setHistoryLoading] = useState(true);
   const { toasts, addToast } = useToast();
 
+  // Reload history when user signs in
   useEffect(() => {
-    fetchHistory();
-  }, []);
+    if (user) {
+      fetchHistory();
+    } else {
+      setHistory([]);
+    }
+  }, [user]);
 
   async function fetchHistory() {
     setHistoryLoading(true);
@@ -80,12 +89,35 @@ function App() {
     window.scrollTo({ top: 0, behavior: 'smooth' });
   }
 
+  async function handleSignOut() {
+    await supabase.auth.signOut();
+    handleReset();
+    addToast('info', 'Signed out successfully.');
+  }
+
+  // Show nothing while session is being checked
+  if (authLoading) {
+    return (
+      <div className="auth-loading">
+        <div className="overlay-spinner" style={{ margin: '0 auto' }} />
+      </div>
+    );
+  }
+
+  // Show auth form if no user is signed in
+  if (!user) {
+    return (
+      <>
+        <AuthForm />
+        <ToastContainer toasts={toasts} />
+      </>
+    );
+  }
+
+  // Main app — user is authenticated
   return (
     <div className="app-wrapper">
-      {/* Full-screen analysis overlay */}
       <AnalysisOverlay visible={phase === 'analysing'} />
-
-      {/* Toast notifications */}
       <ToastContainer toasts={toasts} />
 
       <header className="app-header">
@@ -93,24 +125,25 @@ function App() {
           <h1>SkillGap Analyser</h1>
           <p>Compare your CV against any job description instantly.</p>
         </div>
+        <div className="header-user">
+          <span className="header-email">{user.email}</span>
+          <button className="signout-button" onClick={handleSignOut}>
+            Sign Out
+          </button>
+        </div>
       </header>
 
       <main className="app-main">
-
-        {/* Error state */}
         {phase === 'error' && error && (
           <ErrorCard message={error} onRetry={handleReset} />
         )}
 
-        {/* Analysing state — show skeleton behind overlay */}
         {phase === 'analysing' && <DashboardSkeleton />}
 
-        {/* Results state */}
         {phase === 'results' && result && (
           <ResultsDashboard result={result} onReset={handleReset} />
         )}
 
-        {/* Idle and error states — show form and history */}
         {(phase === 'idle' || phase === 'error') && (
           <>
             <InputForm onSubmit={handleAnalyse} isLoading={false} />
@@ -121,7 +154,6 @@ function App() {
             />
           </>
         )}
-
       </main>
 
       <footer className="app-footer">

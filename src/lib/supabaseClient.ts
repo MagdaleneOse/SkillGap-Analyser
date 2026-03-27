@@ -1,5 +1,3 @@
-// src/lib/supabaseClient.ts
-
 import { createClient } from '@supabase/supabase-js';
 import type { AnalysisRecord, AnalysisResult } from '../types';
 
@@ -14,14 +12,21 @@ if (!supabaseUrl || !supabaseAnonKey) {
 
 export const supabase = createClient(supabaseUrl, supabaseAnonKey);
 
-// ── Save a new analysis result to the database ──
-
 export async function saveAnalysis(
   cvText: string,
   jobDescription: string,
   result: AnalysisResult
 ): Promise<void> {
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
+
+  if (!user) {
+    throw new Error('You must be signed in to save an analysis.');
+  }
+
   const { error } = await supabase.from('analyses').insert({
+    user_id: user.id,
     cv_text: cvText,
     job_description: jobDescription,
     match_percentage: result.matchPercentage,
@@ -36,12 +41,19 @@ export async function saveAnalysis(
   }
 }
 
-// ── Load the 10 most recent analyses from the database ──
-
 export async function loadAnalysisHistory(): Promise<AnalysisRecord[]> {
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
+
+  if (!user) {
+    throw new Error('You must be signed in to load analysis history.');
+  }
+
   const { data, error } = await supabase
     .from('analyses')
     .select('*')
+    .eq('user_id', user.id)
     .order('created_at', { ascending: false })
     .limit(10);
 
