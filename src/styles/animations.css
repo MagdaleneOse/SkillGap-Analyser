@@ -1,0 +1,344 @@
+/* src/styles/animations.css */
+
+/* ── Custom Properties ── */
+
+:root {
+    --dur-fast: 180ms;
+    --dur-base: 320ms;
+    --dur-slow: 560ms;
+    --dur-overlay: 1.8s;
+    --ease-spring: cubic-bezier(0.34, 1.56, 0.64, 1);
+    --ease-out: cubic-bezier(0.22, 1, 0.36, 1);
+    --ease-in-out: cubic-bezier(0.65, 0, 0.35, 1);
+  }
+  
+  /* ── Keyframes ── */
+  
+  @keyframes fadeUp {
+    from {
+      opacity: 0;
+      transform: translateY(18px);
+    }
+    to {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  }
+  
+  @keyframes fadeIn {
+    from { opacity: 0; }
+    to   { opacity: 1; }
+  }
+  
+  @keyframes shimmer {
+    from { background-position: -400px 0; }
+    to   { background-position: 400px 0; }
+  }
+  
+  @keyframes strokeDraw {
+    from { stroke-dashoffset: var(--circumference); }
+    to   { stroke-dashoffset: var(--target-offset); }
+  }
+  
+  @keyframes barGrow {
+    from { width: 0%; }
+    to   { width: var(--bar-width); }
+  }
+  
+  @keyframes shake {
+    0%, 100% { transform: translateX(0); }
+    20%       { transform: translateX(-6px); }
+    40%       { transform: translateX(6px); }
+    60%       { transform: translateX(-4px); }
+    80%       { transform: translateX(4px); }
+  }
+  
+  @keyframes toastIn {
+    from {
+      opacity: 0;
+      transform: translateX(110%);
+    }
+    to {
+      opacity: 1;
+      transform: translateX(0);
+    }
+  }
+  
+  @keyframes toastOut {
+    from {
+      opacity: 1;
+      transform: translateX(0);
+    }
+    to {
+      opacity: 0;
+      transform: translateX(110%);
+    }
+  }
+  
+  @keyframes pulse {
+    0%, 100% { opacity: 1; }
+    50%       { opacity: 0.4; }
+  }
+  
+  @keyframes dotFill {
+    from { background: #e5e7eb; }
+    to   { background: #4f46e5; }
+  }
+  
+  /* ── Utility Classes ── */
+  
+  .animate-fade-up {
+    animation: fadeUp var(--dur-base) var(--ease-out) both;
+  }
+  
+  .animate-fade-in {
+    animation: fadeIn var(--dur-base) var(--ease-out) both;
+  }
+  
+  .animate-shake {
+    animation: shake 420ms var(--ease-in-out);
+  }
+  
+  /* ── Stagger Children ── */
+  
+  .stagger-children > *:nth-child(1)  { animation-delay: 0ms; }
+  .stagger-children > *:nth-child(2)  { animation-delay: 80ms; }
+  .stagger-children > *:nth-child(3)  { animation-delay: 160ms; }
+  .stagger-children > *:nth-child(4)  { animation-delay: 240ms; }
+  .stagger-children > *:nth-child(5)  { animation-delay: 320ms; }
+  .stagger-children > *:nth-child(6)  { animation-delay: 400ms; }
+  .stagger-children > *:nth-child(7)  { animation-delay: 480ms; }
+  .stagger-children > *:nth-child(8)  { animation-delay: 560ms; }
+  
+  /* ── Skeleton Shimmer ── */
+  
+  .skeleton-block {
+    background: linear-gradient(
+      90deg,
+      #f3f4f6 25%,
+      #e9eaec 50%,
+      #f3f4f6 75%
+    );
+    background-size: 400px 100%;
+    animation: shimmer 1.4s infinite linear;
+    border-radius: 8px;
+  }
+  
+  /* ── Analysis Overlay ── */
+  
+  .overlay-backdrop {
+    position: fixed;
+    inset: 0;
+    background: rgba(15, 15, 30, 0.82);
+    backdrop-filter: blur(4px);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 100;
+    animation: fadeIn var(--dur-base) var(--ease-out) both;
+  }
+  
+  .overlay-card {
+    background: white;
+    border-radius: 16px;
+    padding: 2.5rem 3rem;
+    text-align: center;
+    max-width: 400px;
+    width: 90%;
+    box-shadow: 0 24px 64px rgba(0, 0, 0, 0.25);
+  }
+  
+  .overlay-spinner {
+    width: 52px;
+    height: 52px;
+    border: 4px solid #e5e7eb;
+    border-top-color: #4f46e5;
+    border-radius: 50%;
+    animation: spin 0.75s linear infinite;
+    margin: 0 auto 1.5rem;
+  }
+  
+  .overlay-title {
+    font-size: 1.1rem;
+    font-weight: 700;
+    color: #1a1a2e;
+    margin-bottom: 0.5rem;
+  }
+  
+  .overlay-step {
+    font-size: 0.875rem;
+    color: #6b7280;
+    min-height: 1.4em;
+    animation: fadeIn var(--dur-fast) var(--ease-out) both;
+  }
+  
+  .overlay-dots {
+    display: flex;
+    justify-content: center;
+    gap: 0.4rem;
+    margin-top: 1.5rem;
+  }
+  
+  .overlay-dot {
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    background: #e5e7eb;
+    transition: background 0.4s;
+  }
+  
+  .overlay-dot.active {
+    background: #4f46e5;
+  }
+  
+  /* ── Toast ── */
+  
+  .toast-container {
+    position: fixed;
+    bottom: 1.5rem;
+    right: 1.5rem;
+    display: flex;
+    flex-direction: column;
+    gap: 0.6rem;
+    z-index: 200;
+  }
+  
+  .toast {
+    display: flex;
+    align-items: center;
+    gap: 0.65rem;
+    padding: 0.75rem 1.1rem;
+    border-radius: 10px;
+    font-size: 0.875rem;
+    font-weight: 500;
+    box-shadow: 0 4px 16px rgba(0, 0, 0, 0.12);
+    animation: toastIn var(--dur-base) var(--ease-spring) both;
+    max-width: 320px;
+  }
+  
+  .toast.exiting {
+    animation: toastOut var(--dur-fast) var(--ease-in-out) both;
+  }
+  
+  .toast-success {
+    background: #f0fdf4;
+    color: #15803d;
+    border: 1px solid #bbf7d0;
+  }
+  
+  .toast-error {
+    background: #fff5f5;
+    color: #b91c1c;
+    border: 1px solid #fecaca;
+  }
+  
+  .toast-info {
+    background: #eff6ff;
+    color: #1d4ed8;
+    border: 1px solid #bfdbfe;
+  }
+  
+  /* ── Error Card ── */
+  
+  .error-card {
+    background: #fff5f5;
+    border: 1.5px solid #fecaca;
+    border-radius: 12px;
+    padding: 1.5rem;
+    margin-bottom: 1.5rem;
+    display: flex;
+    gap: 1rem;
+    align-items: flex-start;
+    animation: fadeUp var(--dur-base) var(--ease-out) both;
+  }
+  
+  .error-card-icon {
+    font-size: 1.3rem;
+    line-height: 1;
+    flex-shrink: 0;
+  }
+  
+  .error-card-title {
+    font-size: 0.9rem;
+    font-weight: 700;
+    color: #b91c1c;
+    margin-bottom: 0.25rem;
+  }
+  
+  .error-card-message {
+    font-size: 0.85rem;
+    color: #dc2626;
+    line-height: 1.5;
+  }
+  
+  .error-card-retry {
+    margin-top: 0.75rem;
+    background: #dc2626;
+    color: white;
+    border: none;
+    border-radius: 6px;
+    padding: 0.4rem 1rem;
+    font-size: 0.82rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: opacity 0.2s;
+  }
+  
+  .error-card-retry:hover {
+    opacity: 0.88;
+  }
+  
+  /* ── Animated Score Ring ── */
+  
+  .score-ring-svg circle.progress-ring {
+    animation: strokeDraw var(--dur-slow) var(--ease-out) both;
+    animation-delay: 200ms;
+  }
+  
+  /* ── Animated Skill Bar ── */
+  
+  .skill-bar-row {
+    display: flex;
+    flex-direction: column;
+    gap: 0.35rem;
+    margin-bottom: 0.75rem;
+  }
+  
+  .skill-bar-label-row {
+    display: flex;
+    justify-content: space-between;
+    font-size: 0.82rem;
+    font-weight: 500;
+    color: #374151;
+  }
+  
+  .skill-bar-track {
+    height: 8px;
+    background: #f3f4f6;
+    border-radius: 999px;
+    overflow: hidden;
+  }
+  
+  .skill-bar-fill {
+    height: 100%;
+    border-radius: 999px;
+    animation: barGrow var(--dur-slow) var(--ease-out) both;
+  }
+  
+  /* ── Card Hover Effects ── */
+  
+  .chart-card,
+  .score-card,
+  .skill-gap-wrapper,
+  .history-container {
+    transition: transform 0.2s var(--ease-out),
+                box-shadow 0.2s var(--ease-out);
+  }
+  
+  .chart-card:hover,
+  .score-card:hover,
+  .skill-gap-wrapper:hover,
+  .history-container:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 8px 28px rgba(0, 0, 0, 0.11);
+  }
