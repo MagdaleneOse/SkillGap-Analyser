@@ -1,6 +1,7 @@
 // src/components/InputForm.tsx
 
 import React, { useState } from 'react';
+import CvUpload from './CvUpload';
 
 interface InputFormProps {
   onSubmit: (cvText: string, jobDescription: string) => void;
@@ -11,6 +12,12 @@ function InputForm({ onSubmit, isLoading }: InputFormProps) {
   const [cvText, setCvText] = useState('');
   const [jobDescription, setJobDescription] = useState('');
   const [errors, setErrors] = useState({ cv: '', job: '' });
+
+  const handleFileTextExtracted = (text: string) => {
+    setCvText(text);
+    setErrors((prev) => ({ ...prev, cv: '' }));
+    document.getElementById('cv-textarea')?.scrollIntoView({ behavior: 'smooth' });
+  };
 
   function validate(): boolean {
     const newErrors = { cv: '', job: '' };
@@ -46,28 +53,27 @@ function InputForm({ onSubmit, isLoading }: InputFormProps) {
 
       <form onSubmit={handleSubmit} noValidate>
         <div className="form-grid">
-
-          {/* CV Input */}
           <div className="field-group">
-            <label htmlFor="cv-input">
+            <label htmlFor="cv-textarea">
               Your CV
               <span className="char-count">{cvText.length} characters</span>
             </label>
+
+            <CvUpload onTextExtracted={handleFileTextExtracted} />
+
             <textarea
-              id="cv-input"
+              id="cv-textarea"
               value={cvText}
               onChange={(e) => setCvText(e.target.value)}
-              placeholder="Paste your full CV text here..."
+              placeholder="Upload your CV or paste the full CV text here..."
               rows={14}
               disabled={isLoading}
               className={errors.cv ? 'textarea-error' : ''}
             />
-            {errors.cv && (
-              <span className="error-message">{errors.cv}</span>
-            )}
+
+            {errors.cv && <span className="error-message">{errors.cv}</span>}
           </div>
 
-          {/* Job Description Input */}
           <div className="field-group">
             <label htmlFor="job-input">
               Job Description
@@ -82,11 +88,8 @@ function InputForm({ onSubmit, isLoading }: InputFormProps) {
               disabled={isLoading}
               className={errors.job ? 'textarea-error' : ''}
             />
-            {errors.job && (
-              <span className="error-message">{errors.job}</span>
-            )}
+            {errors.job && <span className="error-message">{errors.job}</span>}
           </div>
-
         </div>
 
         <div className="submit-row">
