@@ -1,20 +1,24 @@
-
 // src/App.tsx
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, lazy, Suspense } from 'react';
 import InputForm from './components/InputForm';
-import ResultsDashboard from './components/ResultsDashboard';
-import HistoryTable from './components/HistoryTable';
 import AnalysisOverlay from './components/AnalysisOverlay';
 import ErrorCard from './components/ErrorCard';
 import ToastContainer from './components/ToastContainer';
 import AuthForm from './components/AuthForm';
 import { DashboardSkeleton } from './components/SkeletonCard';
 import { analyseCV } from './lib/analyseCV';
-import { saveAnalysis, loadAnalysisHistory, supabase } from './lib/supabaseClient';
+import {
+  saveAnalysis,
+  loadAnalysisHistory,
+  supabase,
+} from './lib/supabaseClient';
 import { useAuth } from './hooks/useAuth';
 import { useToast } from './hooks/useToast';
 import type { AnalysisResult, AnalysisRecord } from './types';
+
+const ResultsDashboard = lazy(() => import('./components/ResultsDashboard'));
+const HistoryTable = lazy(() => import('./components/HistoryTable'));
 
 type Phase = 'idle' | 'analysing' | 'results' | 'error';
 
@@ -27,12 +31,12 @@ function App() {
   const [historyLoading, setHistoryLoading] = useState(true);
   const { toasts, addToast } = useToast();
 
-  // Reload history when user signs in
   useEffect(() => {
     if (user) {
-      fetchHistory();
+      void fetchHistory();
     } else {
       setHistory([]);
+      setHistoryLoading(false);
     }
   }, [user]);
 
@@ -83,6 +87,7 @@ function App() {
       recommendations: record.recommendations,
       categoryScores: record.category_scores,
     };
+
     setResult(restored);
     setPhase('results');
     setError(null);
@@ -95,7 +100,6 @@ function App() {
     addToast('info', 'Signed out successfully.');
   }
 
-  // Show nothing while session is being checked
   if (authLoading) {
     return (
       <div className="auth-loading">
@@ -104,7 +108,6 @@ function App() {
     );
   }
 
-  // Show auth form if no user is signed in
   if (!user) {
     return (
       <>
@@ -114,7 +117,6 @@ function App() {
     );
   }
 
-  // Main app — user is authenticated
   return (
     <div className="app-wrapper">
       <AnalysisOverlay visible={phase === 'analysing'} />
@@ -141,17 +143,21 @@ function App() {
         {phase === 'analysing' && <DashboardSkeleton />}
 
         {phase === 'results' && result && (
-          <ResultsDashboard result={result} onReset={handleReset} />
+          <Suspense fallback={<DashboardSkeleton />}>
+            <ResultsDashboard result={result} onReset={handleReset} />
+          </Suspense>
         )}
 
         {(phase === 'idle' || phase === 'error') && (
           <>
             <InputForm onSubmit={handleAnalyse} isLoading={false} />
-            <HistoryTable
-              records={history}
-              isLoading={historyLoading}
-              onSelect={handleSelectRecord}
-            />
+            <Suspense fallback={<div className="history-loading">Loading history...</div>}>
+              <HistoryTable
+                records={history}
+                isLoading={historyLoading}
+                onSelect={handleSelectRecord}
+              />
+            </Suspense>
           </>
         )}
       </main>
