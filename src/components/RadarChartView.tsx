@@ -1,4 +1,3 @@
-import React from 'react';
 import {
   Radar,
   RadarChart,
@@ -8,8 +7,7 @@ import {
   ResponsiveContainer,
   Tooltip,
 } from 'recharts';
-// always use type-only imports from types folder
-import type { CategoryScore, AnalysisResult } from '../types';
+import type { CategoryScore } from '../types';
 
 interface RadarChartViewProps {
   categoryScores: CategoryScore[];
@@ -30,7 +28,7 @@ function RadarChartView({ categoryScores }: RadarChartViewProps) {
         >
           <PolarGrid stroke="#e5e7eb" />
           <PolarAngleAxis
-            dataKey="name"
+            dataKey="category"
             tick={{ fontSize: 12, fill: '#374151', fontWeight: 500 }}
           />
           <PolarRadiusAxis
@@ -41,14 +39,14 @@ function RadarChartView({ categoryScores }: RadarChartViewProps) {
           />
           <Radar
             name="Score"
-            dataKey="value"
+            dataKey="score"
             stroke="#4f46e5"
             fill="#4f46e5"
             fillOpacity={0.25}
             strokeWidth={2}
           />
           <Tooltip
-            formatter={(value: number) => [`${value}%`, 'Score']}
+            formatter={(value) => [`${Number(value ?? 0)}%`, 'Score']}
             contentStyle={{
               borderRadius: '8px',
               border: '1px solid #e5e7eb',

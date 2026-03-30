@@ -1,7 +1,5 @@
 // src/components/SkillGapList.tsx
 
-import React from 'react';
-
 interface SkillGapListProps {
   matchedSkills: string[];
   missingSkills: string[];
@@ -15,7 +13,6 @@ function SkillGapList({
 }: SkillGapListProps) {
   return (
     <div className="skill-gap-wrapper">
-
       {/* Matched Skills */}
       <div className="skill-section">
         <div className="skill-section-header matched">
@@ -70,7 +67,6 @@ function SkillGapList({
           ))}
         </ol>
       </div>
-
     </div>
   );
 }

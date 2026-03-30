@@ -1,6 +1,5 @@
 // src/components/BarChartView.tsx
 
-import React from 'react';
 import {
   BarChart,
   Bar,
@@ -11,8 +10,7 @@ import {
   ResponsiveContainer,
   Cell,
 } from 'recharts';
-// always use type-only imports from types folder
-import type { CategoryScore, AnalysisResult } from '../types';
+import type { CategoryScore } from '../types';
 
 interface BarChartViewProps {
   categoryScores: CategoryScore[];
@@ -53,10 +51,10 @@ function BarChartView({ categoryScores }: BarChartViewProps) {
           <YAxis
             domain={[0, 100]}
             tick={{ fontSize: 11, fill: '#9ca3af' }}
-            tickFormatter={(value: number) => `${value}%`}
+            tickFormatter={(value) => `${value}%`}
           />
           <Tooltip
-            formatter={(value: number) => [`${value}%`, 'Score']}
+            formatter={(value) => [`${Number(value ?? 0)}%`, 'Score']}
             contentStyle={{
               borderRadius: '8px',
               border: '1px solid #e5e7eb',

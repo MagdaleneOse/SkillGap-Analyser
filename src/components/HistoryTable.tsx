@@ -1,6 +1,5 @@
 // src/components/HistoryTable.tsx
 
-import React from 'react';
 import type { AnalysisRecord } from '../types';
 
 interface HistoryTableProps {

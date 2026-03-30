@@ -1,7 +1,5 @@
 // src/components/AnimatedScoreRing.tsx
 
-import React from 'react';
-
 interface AnimatedScoreRingProps {
   percentage: number;
 }

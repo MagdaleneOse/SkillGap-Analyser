@@ -1,7 +1,5 @@
 // src/components/ErrorCard.tsx
 
-import React from 'react';
-
 interface ErrorCardProps {
   message: string;
   onRetry: () => void;

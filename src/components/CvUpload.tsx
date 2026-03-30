@@ -1,88 +1,95 @@
-import React, { useRef, useState, useCallback } from 'react'
+import {
+  useRef,
+  useState,
+  useCallback,
+  type ChangeEvent,
+  type DragEvent,
+  type CSSProperties,
+} from 'react';
 import {
   extractTextFromFile,
   validateFile,
   ACCEPTED_EXTENSIONS,
-} from '../utils/extractTextFromFile'
+} from '../utils/extractTextFromFile';
 
 interface Props {
-  onTextExtracted: (text: string) => void
+  onTextExtracted: (text: string) => void;
 }
 
-type UploadStatus = 'idle' | 'processing' | 'success' | 'error'
+type UploadStatus = 'idle' | 'processing' | 'success' | 'error';
 
 export default function CvUpload({ onTextExtracted }: Props) {
-  const fileInputRef = useRef<HTMLInputElement>(null)
-  const [status, setStatus] = useState<UploadStatus>('idle')
-  const [fileName, setFileName] = useState<string | null>(null)
-  const [errorMessage, setErrorMessage] = useState<string | null>(null)
-  const [isDragOver, setIsDragOver] = useState(false)
+  const fileInputRef = useRef<HTMLInputElement>(null);
+  const [status, setStatus] = useState<UploadStatus>('idle');
+  const [fileName, setFileName] = useState<string | null>(null);
+  const [errorMessage, setErrorMessage] = useState<string | null>(null);
+  const [isDragOver, setIsDragOver] = useState(false);
 
   const processFile = useCallback(
     async (file: File) => {
-      setErrorMessage(null)
-      setStatus('processing')
-      setFileName(file.name)
+      setErrorMessage(null);
+      setStatus('processing');
+      setFileName(file.name);
 
-      const validationError = validateFile(file)
+      const validationError = validateFile(file);
       if (validationError) {
-        setErrorMessage(validationError)
-        setStatus('error')
-        return
+        setErrorMessage(validationError);
+        setStatus('error');
+        return;
       }
 
       try {
-        const extractedText = await extractTextFromFile(file)
+        const extractedText = await extractTextFromFile(file);
 
         if (!extractedText || extractedText.trim().length < 50) {
           throw new Error(
             'Extracted text is too short. The file may be image-based or password-protected. Try copying and pasting your CV text instead.'
-          )
+          );
         }
 
-        onTextExtracted(extractedText)
-        setStatus('success')
+        onTextExtracted(extractedText);
+        setStatus('success');
       } catch (err) {
         const message =
           err instanceof Error
             ? err.message
-            : 'Extraction failed. Please try again.'
-        setErrorMessage(message)
-        setStatus('error')
+            : 'Extraction failed. Please try again.';
+        setErrorMessage(message);
+        setStatus('error');
       }
     },
     [onTextExtracted]
-  )
+  );
 
-  const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const file = e.target.files?.[0]
+  const handleFileChange = (e: ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
     if (file) {
-      void processFile(file)
+      void processFile(file);
     }
-    e.target.value = ''
-  }
+    e.target.value = '';
+  };
 
-  const handleDragOver = (e: React.DragEvent<HTMLDivElement>) => {
-    e.preventDefault()
+  const handleDragOver = (e: DragEvent<HTMLDivElement>) => {
+    e.preventDefault();
     if (status !== 'processing') {
-      setIsDragOver(true)
+      setIsDragOver(true);
     }
-  }
+  };
 
   const handleDragLeave = () => {
-    setIsDragOver(false)
-  }
+    setIsDragOver(false);
+  };
 
-  const handleDrop = (e: React.DragEvent<HTMLDivElement>) => {
-    e.preventDefault()
-    if (status === 'processing') return
+  const handleDrop = (e: DragEvent<HTMLDivElement>) => {
+    e.preventDefault();
+    if (status === 'processing') return;
 
-    setIsDragOver(false)
-    const file = e.dataTransfer.files?.[0]
+    setIsDragOver(false);
+    const file = e.dataTransfer.files?.[0];
     if (file) {
-      void processFile(file)
+      void processFile(file);
     }
-  }
+  };
 
   const statusConfig = {
     idle: {
@@ -109,16 +116,16 @@ export default function CvUpload({ onTextExtracted }: Props) {
       icon: '❌',
       message: errorMessage ?? 'An error occurred.',
     },
-  } as const
+  } as const;
 
-  const current = statusConfig[status]
+  const current = statusConfig[status];
 
   return (
     <div style={styles.wrapper}>
       <div
         onClick={() => {
           if (status !== 'processing') {
-            fileInputRef.current?.click()
+            fileInputRef.current?.click();
           }
         }}
         onDragOver={handleDragOver}
@@ -160,10 +167,10 @@ export default function CvUpload({ onTextExtracted }: Props) {
         <hr style={styles.line} />
       </div>
     </div>
-  )
+  );
 }
 
-const styles: Record<string, React.CSSProperties> = {
+const styles: Record<string, CSSProperties> = {
   wrapper: {
     display: 'flex',
     flexDirection: 'column',
@@ -216,4 +223,4 @@ const styles: Record<string, React.CSSProperties> = {
     color: '#a0aec0',
     whiteSpace: 'nowrap',
   },
-}
+};

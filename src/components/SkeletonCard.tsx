@@ -1,12 +1,13 @@
 // src/components/SkeletonCard.tsx
 
-import React from 'react';
-
 function SkeletonCard() {
   return (
     <div className="score-card" style={{ gap: '1rem' }}>
       <div className="skeleton-block" style={{ height: '14px', width: '60%' }} />
-      <div className="skeleton-block" style={{ height: '140px', width: '140px', borderRadius: '50%' }} />
+      <div
+        className="skeleton-block"
+        style={{ height: '140px', width: '140px', borderRadius: '50%' }}
+      />
       <div className="skeleton-block" style={{ height: '12px', width: '40%' }} />
       <div className="skeleton-block" style={{ height: '10px', width: '80%' }} />
       <div className="skeleton-block" style={{ height: '10px', width: '65%' }} />

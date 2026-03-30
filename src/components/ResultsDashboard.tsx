@@ -1,6 +1,5 @@
 // src/components/ResultsDashboard.tsx
 
-import React from 'react';
 import type { AnalysisResult } from '../types';
 import MatchScoreCard from './MatchScoreCard';
 import SkillGapList from './SkillGapList';
@@ -16,7 +15,6 @@ interface ResultsDashboardProps {
 function ResultsDashboard({ result, onReset }: ResultsDashboardProps) {
   return (
     <div className="dashboard-wrapper stagger-children">
-
       {/* Header */}
       <div className="dashboard-header animate-fade-up">
         <h2>Analysis Results</h2>
@@ -38,7 +36,9 @@ function ResultsDashboard({ result, onReset }: ResultsDashboardProps) {
       {/* Category score bars */}
       <div className="chart-card animate-fade-up">
         <h3 className="chart-title">Category Scores</h3>
-        <p className="chart-subtitle">Animated breakdown per competency area</p>
+        <p className="chart-subtitle">
+          Animated breakdown per competency area
+        </p>
         {result.categoryScores.map((cat, i) => (
           <AnimatedSkillBar
             key={cat.category}
@@ -54,7 +54,6 @@ function ResultsDashboard({ result, onReset }: ResultsDashboardProps) {
         <RadarChartView categoryScores={result.categoryScores} />
         <BarChartView categoryScores={result.categoryScores} />
       </div>
-
     </div>
   );
 }

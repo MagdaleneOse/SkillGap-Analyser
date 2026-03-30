@@ -1,6 +1,5 @@
 // src/components/MatchScoreCard.tsx
 
-import React from 'react';
 import AnimatedScoreRing from './AnimatedScoreRing';
 
 interface MatchScoreCardProps {

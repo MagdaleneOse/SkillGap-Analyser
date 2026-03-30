@@ -31,47 +31,78 @@ export function validateFile(file: File): string | null {
 }
 
 async function extractFromPdf(file: File): Promise<string> {
-  const arrayBuffer = await file.arrayBuffer()
+  try {
+    const arrayBuffer = await file.arrayBuffer()
 
-  const loadingTask = pdfjsLib.getDocument({
-    data: arrayBuffer,
-    useWorkerFetch: false,
-    isEvalSupported: false,
-  })
+    const loadingTask = pdfjsLib.getDocument({
+      data: arrayBuffer,
+      useWorkerFetch: false,
+      isEvalSupported: false,
+      stopAtErrors: false,
+    })
 
-  const pdf = await loadingTask.promise
-  const pages: string[] = []
+    const pdf = await loadingTask.promise
+    const pages: string[] = []
 
-  for (let pageNum = 1; pageNum <= pdf.numPages; pageNum++) {
-    const page = await pdf.getPage(pageNum)
-    const textContent = await page.getTextContent()
+    for (let pageNum = 1; pageNum <= pdf.numPages; pageNum++) {
+      const page = await pdf.getPage(pageNum)
+      const textContent = await page.getTextContent()
 
-    const pageText = textContent.items
-      .map((item: unknown) => {
-        if (typeof item === 'object' && item !== null && 'str' in item) {
-          return String((item as { str: string }).str)
-        }
-        return ''
-      })
-      .join(' ')
-      .replace(/\s+/g, ' ')
-      .trim()
+      const pageText = textContent.items
+        .map((item: unknown) => {
+          if (typeof item === 'object' && item !== null && 'str' in item) {
+            return String((item as { str: string }).str)
+          }
+          return ''
+        })
+        .join(' ')
+        .replace(/\s+/g, ' ')
+        .trim()
 
-    pages.push(pageText)
+      if (pageText) {
+        pages.push(pageText)
+      }
+    }
+
+    const fullText = pages.join('\n\n').trim()
+
+    if (!fullText) {
+      throw new Error(
+        'No readable text was found in this PDF. It may be scanned, image-based, password-protected, or use embedded fonts that prevent extraction.'
+      )
+    }
+
+    return fullText
+  } catch (error) {
+    console.error('PDF extraction error:', error)
+    throw new Error(
+      'Could not extract readable text from this PDF. Try uploading a DOCX or TXT file, or paste your CV text manually.'
+    )
   }
-
-  return pages.join('\n\n').trim()
 }
 
 async function extractFromDocx(file: File): Promise<string> {
-  const arrayBuffer = await file.arrayBuffer()
-  const result = await mammoth.extractRawText({ arrayBuffer })
+  try {
+    const arrayBuffer = await file.arrayBuffer()
+    const result = await mammoth.extractRawText({ arrayBuffer })
 
-  if (result.messages.length > 0) {
-    console.warn('Mammoth warnings:', result.messages)
+    if (result.messages.length > 0) {
+      console.warn('Mammoth warnings:', result.messages)
+    }
+
+    const text = result.value.trim()
+
+    if (!text) {
+      throw new Error('No readable text was found in this DOCX file.')
+    }
+
+    return text
+  } catch (error) {
+    console.error('DOCX extraction error:', error)
+    throw new Error(
+      'Could not extract readable text from this DOCX file. Try saving it again as .docx or paste the CV text manually.'
+    )
   }
-
-  return result.value.trim()
 }
 
 function extractFromTxt(file: File): Promise<string> {
@@ -79,7 +110,14 @@ function extractFromTxt(file: File): Promise<string> {
     const reader = new FileReader()
 
     reader.onload = (e) => {
-      resolve((e.target?.result as string).trim())
+      const text = (e.target?.result as string).trim()
+
+      if (!text) {
+        reject(new Error('The text file is empty.'))
+        return
+      }
+
+      resolve(text)
     }
 
     reader.onerror = () => {

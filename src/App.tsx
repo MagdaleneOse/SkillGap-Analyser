@@ -1,7 +1,7 @@
 
 // src/App.tsx
 
-import React, { useState, useEffect } from 'react';
+import { useState, useEffect } from 'react';
 import InputForm from './components/InputForm';
 import ResultsDashboard from './components/ResultsDashboard';
 import HistoryTable from './components/HistoryTable';

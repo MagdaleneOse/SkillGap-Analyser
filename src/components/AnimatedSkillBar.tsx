@@ -1,7 +1,5 @@
 // src/components/AnimatedSkillBar.tsx
 
-import React from 'react';
-
 interface AnimatedSkillBarProps {
   label: string;
   score: number;
@@ -16,7 +14,10 @@ function getBarColour(score: number): string {
 
 function AnimatedSkillBar({ label, score, delay = 0 }: AnimatedSkillBarProps) {
   return (
-    <div className="skill-bar-row animate-fade-up" style={{ animationDelay: `${delay}ms` }}>
+    <div
+      className="skill-bar-row animate-fade-up"
+      style={{ animationDelay: `${delay}ms` }}
+    >
       <div className="skill-bar-label-row">
         <span>{label}</span>
         <span>{score}%</span>
